@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Pacer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        
+        /* Breathing Animation */
+        @keyframes breathe {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .animate-breathe {
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        /* Smooth Screen Transitions */
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Progress Bar Transition */
+        .progress-bar {
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- App Container -->
+    <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden min-h-[500px] flex flex-col relative border border-slate-700">
+        
+        <!-- Header -->
+        <div class="bg-slate-950 p-4 text-center border-b border-slate-700">
+            <h1 class="font-bold text-xl text-indigo-400 tracking-wide">Story Pacer</h1>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 p-6 flex flex-col justify-center">
+
+            <!-- HOME SCREEN -->
+            <div id="screen-home" class="screen active flex-col items-center text-center gap-4">
+                <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mb-2">
+                    <span class="text-3xl">🎙️</span>
+                </div>
+                <h2 class="text-2xl font-bold">Atmosphäre Trainieren</h2>
+                <p class="text-slate-400 text-sm mb-2">Übe das Erzählen ohne Hektik. Trenne den Aufbau der Szene von der Handlung und lerne, Pausen auszuhalten.</p>
+                
+                <p id="url-story-hint" class="text-sm text-emerald-400 font-medium hidden">📌 Custom-Szenario aus URL geladen!</p>
+
+                <button onclick="startSession()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-8 rounded-lg transition-colors w-full mt-2">
+                    Starten
+                </button>
+
+                <!-- Import Section -->
+                <div class="w-full mt-2">
+                    <label for="json-import" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-700/50 hover:bg-slate-700 text-slate-300 border border-slate-600 font-medium py-2 px-4 rounded-lg transition-colors w-full text-sm">
+                        <span>📁 Eigene Szenarien laden (.json)</span>
+                        <input type="file" id="json-import" accept=".json" class="hidden" onchange="handleImport(event)">
+                    </label>
+                    <p id="import-status" class="text-xs mt-2 h-4 hidden transition-opacity"></p>
+                </div>
+
+                <!-- Help Button -->
+                <button onclick="showScreen('help')" class="mt-4 text-slate-400 hover:text-slate-200 text-sm underline decoration-slate-600 underline-offset-4 transition-colors">
+                    Anleitung & Vorlagen
+                </button>
+            </div>
+
+            <!-- HELP SCREEN -->
+            <div id="screen-help" class="screen flex-col gap-6 h-full overflow-y-auto pb-4">
+                <div class="flex items-center gap-4 mb-2">
+                    <button onclick="showScreen('home')" class="text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                        ←
+                    </button>
+                    <h2 class="text-xl font-bold">Anleitung & Setup</h2>
+                </div>
+
+                <div class="space-y-6 text-sm text-slate-300">
+                    <!-- JSON Section -->
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <h3 class="text-white font-bold text-base mb-2">1. JSON Datei importieren</h3>
+                        <p class="mb-3">Lade eigene Szenarien hoch. Die Datei muss eine Liste (Array) im JSON-Format sein.</p>
+                        <div class="bg-slate-950 p-3 rounded font-mono text-xs text-indigo-300 mb-3 overflow-x-auto">
+[
+  "Szenario 1: Dunkler Wald...",
+  "Szenario 2: Leerer Aufzug..."
+]
+                        </div>
+                        <button onclick="downloadSchema()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded transition-colors text-xs font-medium flex items-center gap-2">
+                            <span>⬇️</span> Vorlage.json herunterladen
+                        </button>
+                    </div>
+
+                    <!-- URL Section -->
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <h3 class="text-white font-bold text-base mb-2">2. Direkter URL-Link</h3>
+                        <p class="mb-3">Willst du einen bestimmten Text üben, ohne dem Zufall zu vertrauen? Häng ihn als Parameter an die URL an. Das überschreibt den normalen Pool.</p>
+                        <div class="bg-slate-950 p-3 rounded font-mono text-xs text-emerald-300 overflow-x-auto break-all">
+.../index.html?story=Du wachst in einem Sarg auf
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BREATHE SCREEN -->
+            <div id="screen-breathe" class="screen flex-col items-center justify-center text-center gap-8 h-full">
+                <h2 class="text-xl font-medium text-slate-300">Tief ausatmen.</h2>
+                <div class="relative flex items-center justify-center w-32 h-32">
+                    <div class="absolute w-16 h-16 bg-indigo-500 rounded-full animate-breathe"></div>
+                    <div class="absolute w-4 h-4 bg-white rounded-full"></div>
+                </div>
+                <p class="text-slate-500 text-sm">Bereite dich vor. Die Luft muss raus.</p>
+            </div>
+
+            <!-- SETUP SCREEN -->
+            <div id="screen-setup" class="screen flex-col gap-6">
+                <div class="flex justify-between items-center text-sm font-medium text-indigo-400">
+                    <span>Phase 1: Das Setup</span>
+                    <span id="timer-setup" class="bg-indigo-500/20 px-2 py-1 rounded">45s</span>
+                </div>
+                
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
+                    <p class="text-xs text-slate-500 uppercase font-bold mb-2">Dein Szenario</p>
+                    <p id="prompt-text" class="font-medium text-lg leading-snug"></p>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-sm text-slate-400">Beschreibe <span class="text-white font-bold">nur</span> die Umgebung. Keine Handlung. Nutze deine Sinne:</p>
+                    <div class="flex gap-2">
+                        <div class="flex-1 bg-slate-700/50 p-3 rounded text-center"><span class="text-xl block mb-1">👁️</span><span class="text-xs text-slate-300">Sehen</span></div>
+                        <div class="flex-1 bg-slate-700/50 p-3 rounded text-center"><span class="text-xl block mb-1">👂</span><span class="text-xs text-slate-300">Hören</span></div>
+                        <div class="flex-1 bg-slate-700/50 p-3 rounded text-center"><span class="text-xl block mb-1">✋</span><span class="text-xs text-slate-300">Fühlen/Riechen</span></div>
+                    </div>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-4">
+                        <div id="progress-setup" class="bg-indigo-500 h-full w-full progress-bar"></div>
+                    </div>
+                    <button onclick="nextPhase('pause')" class="bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-4 rounded-lg transition-colors w-full text-sm">
+                        Fertig mit Aufbau (Weiter)
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAUSE SCREEN -->
+            <div id="screen-pause" class="screen flex-col items-center justify-center text-center gap-6 h-full">
+                <div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center border-2 border-rose-500">
+                    <span class="text-3xl">🛑</span>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-rose-400 mb-2">Wirkungspause</h2>
+                    <p class="text-slate-300">Nichts sagen. Halt die Stille aus.</p>
+                </div>
+                <div class="text-5xl font-bold text-white mt-4" id="timer-pause">3</div>
+            </div>
+
+            <!-- ACTION SCREEN -->
+            <div id="screen-action" class="screen flex-col gap-6">
+                <div class="flex justify-between items-center text-sm font-medium text-emerald-400">
+                    <span>Phase 2: Die Handlung</span>
+                    <span id="timer-action" class="bg-emerald-500/20 px-2 py-1 rounded">45s</span>
+                </div>
+                
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
+                    <p class="text-xs text-slate-500 uppercase font-bold mb-2">Dein Szenario</p>
+                    <p id="prompt-text-action" class="font-medium text-lg leading-snug text-slate-400 italic"></p>
+                </div>
+
+                <div class="py-6 text-center">
+                    <span class="text-4xl mb-4 block">🎬</span>
+                    <p class="text-lg">Was passiert jetzt?</p>
+                    <p class="text-sm text-slate-400 mt-2">Jetzt darf die Story weitergehen. Sprich langsam.</p>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-4">
+                        <div id="progress-action" class="bg-emerald-500 h-full w-full progress-bar"></div>
+                    </div>
+                    <button onclick="endSession()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-lg transition-colors w-full">
+                        Story beenden
+                    </button>
+                </div>
+            </div>
+
+            <!-- DONE SCREEN -->
+            <div id="screen-done" class="screen flex-col items-center justify-center text-center gap-6 h-full">
+                <span class="text-5xl">✅</span>
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Gut gemacht.</h2>
+                    <p class="text-slate-400 text-sm">Ging es dir im zweiten Teil leichter, nachdem das Fundament stand?</p>
+                </div>
+                <button onclick="resetApp()" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-lg transition-colors w-full">
+                    Neue Runde
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let prompts = [
+            "Du stehst nachts allein an einer verlassenen Bushaltestelle mitten im Wald.",
+            "Du betrittst ein uraltes Antiquariat, das seit Jahren verschlossen war.",
+            "Du wachst auf einem kleinen Holzboot mitten auf dem Ozean auf.",
+            "Du entdeckst eine schwere Eisentür im Keller deiner Großeltern.",
+            "Du stehst im Flur eines Krankenhauses, aber der Strom ist komplett ausgefallen.",
+            "Ein staubiger Dachboden im Sommer. Sonnenlicht fällt durch eine Luke.",
+            "Ein verlassener Jahrmarkt in der Dämmerung, das Riesenrad quietscht im Wind.",
+            "Du kriechst durch einen engen, feuchten Lüftungsschacht.",
+            "Ein Raumschiff-Cockpit, in dem nur noch rote Warnleuchten stumm blinken.",
+            "Du stehst in einem dichten Kornfeld, während ein schweres Gewitter aufzieht.",
+            "Eine Holzhütte im verschneiten Gebirge, das Feuer im Kamin ist fast aus.",
+            "Der Warteraum eines abgelegenen Bahnhofs tief in der Nacht.",
+            "Du betrittst einen dunklen Keller, in dem das Wasser knöcheltief steht.",
+            "Ein Gewächshaus, in dem exotische Pflanzen wuchern und alles verschlingen.",
+            "Du wachst in einer Tropfsteinhöhle auf, die von leuchtenden Pilzen erhellt wird.",
+            "Eine enge, regnerische Gasse, beleuchtet von einer flackernden Neonröhre.",
+            "Ein prunkvoller Ballsaal, voll mit brennenden Kerzen, aber ohne einen einzigen Gast."
+        ];
+
+        let currentInterval;
+        let currentPrompt = "";
+
+        // Check URL for Custom Story Parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const storyParam = urlParams.get('story') || urlParams.get('Story');
+        
+        window.onload = () => {
+            if (storyParam && storyParam.trim() !== '') {
+                document.getElementById('url-story-hint').classList.remove('hidden');
+            }
+        };
+
+        // Download JSON Schema Template
+        function downloadSchema() {
+            const template = [
+                "Dein erstes eigenes Szenario.",
+                "Ein weiteres Szenario, in dem du die Atmosphäre beschreibst."
+            ];
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(template, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "story_pacer_vorlage.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // JSON Import Logic
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            const statusEl = document.getElementById('import-status');
+
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    let newPrompts = [];
+
+                    if (Array.isArray(data)) {
+                        newPrompts = data;
+                    } else if (data.prompts && Array.isArray(data.prompts)) {
+                        newPrompts = data.prompts;
+                    } else {
+                        throw new Error("Falsches Format");
+                    }
+
+                    newPrompts = newPrompts.filter(p => typeof p === 'string' && p.trim() !== '');
+
+                    if (newPrompts.length === 0) {
+                        throw new Error("Keine gültigen Texte gefunden.");
+                    }
+
+                    prompts = [...prompts, ...newPrompts];
+
+                    statusEl.innerText = `${newPrompts.length} Szenarien geladen! (Gesamt: ${prompts.length})`;
+                    statusEl.className = "text-xs mt-2 h-4 text-emerald-400 block";
+                    
+                    setTimeout(() => {
+                        statusEl.className = "text-xs mt-2 h-4 hidden";
+                    }, 4000);
+
+                } catch (err) {
+                    statusEl.innerText = "Fehler: Ungültige JSON-Datei.";
+                    statusEl.className = "text-xs mt-2 h-4 text-rose-400 block";
+                }
+                
+                event.target.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${screenId}`).classList.add('active');
+        }
+
+        function startSession() {
+            // Decide which prompt to use
+            if (storyParam && storyParam.trim() !== '') {
+                currentPrompt = decodeURIComponent(storyParam);
+            } else {
+                currentPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            }
+
+            document.getElementById('prompt-text').innerText = currentPrompt;
+            document.getElementById('prompt-text-action').innerText = currentPrompt;
+
+            showScreen('breathe');
+            setTimeout(() => {
+                startSetupPhase();
+            }, 4000);
+        }
+
+        function startSetupPhase() {
+            showScreen('setup');
+            runTimer('setup', 45, 'progress-setup', () => nextPhase('pause'));
+        }
+
+        function startPausePhase() {
+            showScreen('pause');
+            let timeLeft = 3;
+            document.getElementById('timer-pause').innerText = timeLeft;
+            
+            clearInterval(currentInterval);
+            currentInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-pause').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(currentInterval);
+                    startActionPhase();
+                }
+            }, 1000);
+        }
+
+        function startActionPhase() {
+            showScreen('action');
+            runTimer('action', 45, 'progress-action', endSession);
+        }
+
+        function runTimer(phase, seconds, progressId, callback) {
+            clearInterval(currentInterval);
+            let timeLeft = seconds;
+            const total = seconds;
+            const timerEl = document.getElementById(`timer-${phase}`);
+            const progressEl = document.getElementById(progressId);
+
+            timerEl.innerText = `${timeLeft}s`;
+            progressEl.style.width = '100%';
+
+            currentInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = `${timeLeft}s`;
+                progressEl.style.width = `${(timeLeft / total) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(currentInterval);
+                    if(callback) callback();
+                }
+            }, 1000);
+        }
+
+        function nextPhase(phaseName) {
+            clearInterval(currentInterval);
+            if(phaseName === 'pause') startPausePhase();
+        }
+
+        function endSession() {
+            clearInterval(currentInterval);
+            showScreen('done');
+        }
+
+        function resetApp() {
+            showScreen('home');
+        }
+    </script>
+</body>
+</html>
