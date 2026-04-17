@@ -1,0 +1,18 @@
+[  
+  {  
+    "title": "Adventure in the Forest",  
+    "description": "A thrilling adventure where the protagonist navigates through a mystical forest.",  
+    "choices": [  
+      { "option": "Explore the Dark Cave", "result": "You found a treasure and a monster!" },  
+      { "option": "Talk to the Forest Spirits", "result": "They guide you to safety." }  
+    ]  
+  },  
+  {  
+    "title": "Journey to the Castle",  
+    "description": "A quest to reach a haunted castle filled with secrets.",  
+    "choices": [  
+      { "option": "Cross the River", "result": "You encounter a wise old man." },  
+      { "option": "Take the Long Path", "result": "You get lost and meet magical creatures." }  
+    ]  
+  }  
+]
