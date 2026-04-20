@@ -74,6 +74,29 @@ https://m3koenig.github.io/StoryPacer/?story=You%20wake%20up%20in%20an%20old%20l
 
 Perfect for practice groups or teaching scenarios.
 
+## Criteria for Excellent Practice Texts
+A strong practice text in Story Pacer serves as a "spark." It should provide enough detail to create a mental image but remain vague enough for the storyteller to fill in the gaps.
+
+### 1. Focus on Location and Atmosphere (Setting)
+A good text describes a place or a state, not a plot.
+ * **Bad:** "You fight a dragon in a cave." (Dictates action)
+ * **Good:** "You stand at the entrance of a massive cave, with a hot, sulfurous wind blowing from its depths." (Focuses on the setting)
+
+### 2. The VAKOG Principle (Sensory Input)
+Great texts trigger at least two or three senses to make Phase 1 (Setup) easier to navigate:
+ * **Visual (Seeing):** "Flickering neon lights," "thick fog."
+ * **Auditory (Hearing):** "A rhythmic dripping," "distant howling of wolves."
+ * **Kinesthetic/Olfactory (Feeling/Smelling):** "Clammy cold," "the smell of old paper."
+
+### 3. Tension or Curiosity
+An effective scenario creates a subtle sense of tension. Why is the protagonist there? What could happen?
+ * **Example:** "A table grandly set for twelve people, but the food has been rotting for days."
+ * This invites the speaker to describe details in Phase 1 (mold, silverware, silence) before answering "What happens now?" in Phase 2.
+
+### 4. Conciseness and Precision
+A practice text should be graspable in a maximum of two sentences. The storyteller shouldn't be reading a story; they should be forming associations.
+**Senior Dev Tip:** When creating your own scenarios, use words with strong connotations (e.g., "abandoned," "pulsating," "icy," "magnificent"). These adjectives serve as anchors for your free-form narration.
+
 ## Technology Stack
 
 - **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS
