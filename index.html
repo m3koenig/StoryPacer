@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Pacer - v1.2.1</title>
+    <title>Story Pacer - v1.2.2</title>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -56,14 +56,17 @@
         
         <!-- Header -->
         <div class="bg-slate-950 p-4 text-center border-b border-slate-700 flex justify-between items-center px-6">
-            <div class="w-8"></div> <!-- Spacer -->
+            <div class="w-8"></div> <!-- Left Spacer -->
             <h1 class="font-bold text-xl text-indigo-400 tracking-wide">Story Pacer</h1>
-            <!-- Small Install Button (Hidden by default) -->
-            <button id="pwa-install-btn" class="hidden text-indigo-400 hover:text-indigo-300 transition-colors" title="App installieren">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="箭4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-            </button>
+            
+            <!-- Install Button Container -->
+            <div class="flex items-center justify-end w-8">
+                <button id="pwa-install-btn" class="hidden text-indigo-400 hover:text-indigo-300 transition-colors p-1 rounded-full hover:bg-slate-800" title="App installieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Content Area -->
@@ -91,35 +94,40 @@
                     </button>
                 </div>
 
-                <!-- Help Link -->
                 <button onclick="showScreen('help')" class="text-slate-500 hover:text-slate-300 text-xs underline decoration-slate-700 underline-offset-4 transition-colors">
                     Hilfe & Anleitung
                 </button>
             </div>
 
-            <!-- MANAGE SCREEN (Eigene Szenarien) -->
+            <!-- MANAGE SCREEN -->
             <div id="screen-manage" class="screen flex-col gap-6 h-full overflow-y-auto pb-4">
                 <div class="flex items-center gap-4 mb-2">
                     <button onclick="showScreen('home')" class="text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         ←
                     </button>
-                    <h2 class="text-xl font-bold">Szenarien verwalten</h2>
+                    <h2 class="text-xl font-bold">Verwaltung</h2>
                 </div>
 
-                <div class="w-full space-y-5">
+                <div class="w-full space-y-6">
+                    <!-- Import Section -->
                     <div class="space-y-3">
-                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Import via Datei</p>
+                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Import</p>
                         <label for="json-import" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 border border-slate-600 border-dashed font-medium py-3 px-4 rounded-lg transition-colors w-full text-sm">
-                            <span>📁 .json Datei auswählen</span>
+                            <span>📁 Datei laden</span>
                             <input type="file" id="json-import" accept=".json" class="hidden" onchange="handleImport(event)">
                         </label>
+                        <textarea id="json-text-input" placeholder='Beispiel: ["Szenario A", "Szenario B"]' class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-indigo-300 h-24 focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                        <button onclick="handleTextImport()" class="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/50 py-2 px-4 rounded-lg transition-colors text-xs w-full font-bold">
+                            Text laden
+                        </button>
                     </div>
 
-                    <div class="space-y-3">
-                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Manueller Text-Import</p>
-                        <textarea id="json-text-input" placeholder='Beispiel: ["Szenario A", "Szenario B"]' class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-indigo-300 h-32 focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
-                        <button onclick="handleTextImport()" class="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/50 py-2 px-4 rounded-lg transition-colors text-xs w-full font-bold">
-                            JSON-Text laden
+                    <!-- PWA Debug -->
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <p class="text-xs text-slate-500 uppercase font-bold">PWA Status</p>
+                        <p id="pwa-debug-status" class="text-[10px] text-slate-400 font-mono italic">Warte auf Browser-Event...</p>
+                        <button onclick="toggleInstallBtnPreview()" class="text-[10px] bg-slate-700 hover:bg-slate-600 text-slate-300 py-1 px-3 rounded transition-colors">
+                            UI-Vorschau Button erzwingen (Test)
                         </button>
                     </div>
 
@@ -133,30 +141,24 @@
                     <button onclick="showScreen('home')" class="text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         ←
                     </button>
-                    <h2 class="text-xl font-bold">Anleitung & Setup</h2>
+                    <h2 class="text-xl font-bold">Hilfe</h2>
                 </div>
 
                 <div class="space-y-6 text-sm text-slate-300">
                     <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                        <h3 class="text-white font-bold text-base mb-2">1. Eigene Szenarien</h3>
-                        <p class="mb-3">Du kannst unter "Szenarien verwalten" eigene Texte laden. Das Format muss ein valides JSON-Array sein.</p>
-                        <div class="bg-slate-950 p-3 rounded font-mono text-xs text-indigo-300 mb-3 overflow-x-auto">
-[
-  "Dein Text 1",
-  "Dein Text 2"
-]
-                        </div>
-                        <button onclick="downloadSchema()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded transition-colors text-xs font-medium flex items-center gap-2">
-                            <span>⬇️</span> Vorlage herunterladen
-                        </button>
+                        <h3 class="text-white font-bold text-base mb-2">PWA Installation</h3>
+                        <p class="mb-2 leading-relaxed">Auf unterstützten Geräten (Android Chrome, iOS Safari, Desktop Chrome) erscheint oben rechts ein Download-Icon.</p>
+                        <p class="text-xs text-slate-400">Hinweis: Funktioniert nur via HTTPS und nicht innerhalb von Chat-Vorschaufenstern.</p>
                     </div>
 
                     <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                        <h3 class="text-white font-bold text-base mb-2">2. Direkter URL-Link</h3>
-                        <p class="mb-3">Hänge einen Text als Parameter an die URL an:</p>
-                        <div class="bg-slate-950 p-3 rounded font-mono text-xs text-emerald-300 overflow-x-auto break-all">
-.../index.html?story=Dein Text
+                        <h3 class="text-white font-bold text-base mb-2">Eigene Szenarien</h3>
+                        <div class="bg-slate-950 p-3 rounded font-mono text-xs text-indigo-300 mb-3 overflow-x-auto">
+["Text A", "Text B"]
                         </div>
+                        <button onclick="downloadSchema()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded transition-colors text-xs font-medium flex items-center gap-2">
+                            <span>⬇️</span> Vorlage.json
+                        </button>
                     </div>
                 </div>
             </div>
@@ -177,21 +179,18 @@
                     <span>Phase 1: Das Setup</span>
                     <span id="timer-setup" class="bg-indigo-500/20 px-2 py-1 rounded">45s</span>
                 </div>
-                
                 <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
                     <p class="text-xs text-slate-500 uppercase font-bold mb-2">Dein Szenario</p>
                     <p id="prompt-text" class="font-medium text-lg leading-snug"></p>
                 </div>
-
                 <div class="space-y-3">
-                    <p class="text-sm text-slate-400">Beschreibe <span class="text-white font-bold">nur</span> die Umgebung. Keine Handlung. Nutze deine Sinne:</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Beschreibe <span class="text-white font-bold">nur</span> die Umgebung. Nutze deine Sinne:</p>
                     <div class="flex gap-2">
                         <div class="flex-1 bg-slate-700/50 p-3 rounded text-center"><span class="text-xl block mb-1">👁️</span><span class="text-xs text-slate-300">Sehen</span></div>
                         <div class="flex-1 bg-slate-700/50 p-3 rounded text-center"><span class="text-xl block mb-1">👂</span><span class="text-xs text-slate-300">Hören</span></div>
                         <div class="flex-1 bg-slate-700/50 p-3 rounded text-center"><span class="text-xl block mb-1">✋</span><span class="text-xs text-slate-300">Fühlen</span></div>
                     </div>
                 </div>
-
                 <div class="mt-auto">
                     <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-4">
                         <div id="progress-setup" class="bg-indigo-500 h-full w-full progress-bar"></div>
@@ -220,18 +219,14 @@
                     <span>Phase 2: Die Handlung</span>
                     <span id="timer-action" class="bg-emerald-500/20 px-2 py-1 rounded">45s</span>
                 </div>
-                
                 <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
                     <p class="text-xs text-slate-500 uppercase font-bold mb-2">Dein Szenario</p>
                     <p id="prompt-text-action" class="font-medium text-lg leading-snug text-slate-400 italic"></p>
                 </div>
-
                 <div class="py-6 text-center">
                     <span class="text-4xl mb-4 block">🎬</span>
                     <p class="text-lg">Was passiert jetzt?</p>
-                    <p class="text-sm text-slate-400 mt-2">Jetzt darf die Story weitergehen. Sprich langsam.</p>
                 </div>
-
                 <div class="mt-auto">
                     <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-4">
                         <div id="progress-action" class="bg-emerald-500 h-full w-full progress-bar"></div>
@@ -247,7 +242,7 @@
                 <span class="text-5xl">✅</span>
                 <div>
                     <h2 class="text-2xl font-bold mb-2">Gut gemacht.</h2>
-                    <p class="text-slate-400 text-sm">Ging es dir im zweiten Teil leichter, nachdem das Fundament stand?</p>
+                    <p class="text-slate-400 text-sm italic">"In der Pause liegt die Kraft."</p>
                 </div>
                 <button onclick="resetApp()" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-lg transition-colors w-full">
                     Neue Runde
@@ -263,12 +258,14 @@
          */
         let deferredPrompt;
         const installBtn = document.getElementById('pwa-install-btn');
+        const debugStatus = document.getElementById('pwa-debug-status');
 
         // Capture the installation prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.classList.remove('hidden'); // Show small install button in header
+            installBtn.classList.remove('hidden'); 
+            if(debugStatus) debugStatus.innerText = "Installierbar! Button wurde oben rechts aktiviert.";
         });
 
         installBtn.addEventListener('click', async () => {
@@ -276,7 +273,7 @@
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') {
-                console.log('User accepted the install prompt');
+                console.log('User accepted');
             }
             deferredPrompt = null;
             installBtn.classList.add('hidden');
@@ -285,11 +282,17 @@
         window.addEventListener('appinstalled', () => {
             installBtn.classList.add('hidden');
             deferredPrompt = null;
+            if(debugStatus) debugStatus.innerText = "App ist bereits installiert.";
         });
+
+        function toggleInstallBtnPreview() {
+            installBtn.classList.toggle('hidden');
+            if(debugStatus) debugStatus.innerText = "DEBUG: Button-Sichtbarkeit umgeschaltet.";
+        }
 
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
             const swCode = `
-                const CACHE_NAME = 'story-pacer-v1.2.1';
+                const CACHE_NAME = 'story-pacer-v1.2.2';
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./'])));
                 });
@@ -301,11 +304,13 @@
                 const blob = new Blob([swCode], { type: 'text/javascript' });
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl).catch(err => {
-                    console.warn("ServiceWorker Registration failed:", err);
+                    if(debugStatus) debugStatus.innerText = "SW Fehler: Browser blockiert Blob-ServiceWorker.";
                 });
             } catch (e) {
-                console.error("ServiceWorker Initialization failed:", e);
+                console.error("SW Init failed", e);
             }
+        } else {
+            if(debugStatus) debugStatus.innerText = "Browser-Umgebung unterstützt keine PWA (Iframe oder kein HTTPS).";
         }
 
         // Initial Prompts Pool
@@ -356,11 +361,9 @@
                 newPrompts = data;
             } else if (data.prompts && Array.isArray(data.prompts)) {
                 newPrompts = data.prompts;
-            } else {
-                throw new Error("Ungültiges Format");
-            }
+            } else { throw new Error("Format"); }
             newPrompts = newPrompts.filter(p => typeof p === 'string' && p.trim() !== '');
-            if (newPrompts.length === 0) throw new Error("Keine Texte gefunden");
+            if (newPrompts.length === 0) throw new Error("Leer");
             prompts = [...prompts, ...newPrompts];
             return newPrompts.length;
         }
@@ -379,9 +382,7 @@
                 const count = addPromptsToPool(data);
                 showStatus(`${count} Szenarien hinzugefügt!`);
                 document.getElementById('json-text-input').value = '';
-            } catch (err) {
-                showStatus("Fehler: Ungültiges JSON-Format.", true);
-            }
+            } catch (err) { showStatus("Ungültiges JSON.", true); }
         }
 
         function handleImport(event) {
@@ -392,10 +393,8 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     const count = addPromptsToPool(data);
-                    showStatus(`${count} Szenarien aus Datei geladen!`);
-                } catch (err) {
-                    showStatus("Fehler: Ungültige Datei.", true);
-                }
+                    showStatus(`${count} geladen!`);
+                } catch (err) { showStatus("Fehler.", true); }
                 event.target.value = '';
             };
             reader.readAsText(file);
@@ -407,11 +406,7 @@
         }
 
         function startSession() {
-            if (storyParam && storyParam.trim() !== '') {
-                currentPrompt = decodeURIComponent(storyParam);
-            } else {
-                currentPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-            }
+            currentPrompt = (storyParam && storyParam.trim() !== '') ? decodeURIComponent(storyParam) : prompts[Math.floor(Math.random() * prompts.length)];
             document.getElementById('prompt-text').innerText = currentPrompt;
             document.getElementById('prompt-text-action').innerText = currentPrompt;
             showScreen('breathe');
@@ -431,10 +426,7 @@
             currentInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer-pause').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(currentInterval);
-                    startActionPhase();
-                }
+                if (timeLeft <= 0) { clearInterval(currentInterval); startActionPhase(); }
             }, 1000);
         }
 
@@ -455,10 +447,7 @@
                 timeLeft--;
                 timerEl.innerText = `${timeLeft}s`;
                 progressEl.style.width = `${(timeLeft / total) * 100}%`;
-                if (timeLeft <= 0) {
-                    clearInterval(currentInterval);
-                    if(callback) callback();
-                }
+                if (timeLeft <= 0) { clearInterval(currentInterval); if(callback) callback(); }
             }, 1000);
         }
 
@@ -467,26 +456,22 @@
             if(phaseName === 'pause') startPausePhase();
         }
 
-        function endSession() {
-            clearInterval(currentInterval);
-            showScreen('done');
-        }
-
-        function resetApp() {
-            showScreen('home');
-        }
+        function endSession() { clearInterval(currentInterval); showScreen('done'); }
+        function resetApp() { showScreen('home'); }
     </script>
 </body>
 </html>
 
 <!-- 
 CHANGE LOG
-v1.0.0: Initialer Import des Story Pacer Prototyps.
-v1.1.0: PWA-Funktionalität und JSON-Texteingabe hinzugefügt.
-v1.1.1: Service Worker Registrierung nun fehlertolerant (try-catch).
-v1.2.0: GUI-Cleanup, "Eigene Szenarien" in eigenen Screen ausgelagert, Play-Button integriert.
-v1.2.1:
-- PWA Installation: "Install"-Button im Header hinzugefügt.
-- Button erscheint nur, wenn die App installierbar ist (via beforeinstallprompt).
-- Logik zum Auslösen des nativen Installationsdialogs implementiert.
+v1.0.0: Initialer Import.
+v1.1.0: PWA-Feature und JSON-Input.
+v1.1.1: Service Worker Fix (try-catch).
+v1.2.0: GUI-Cleanup, Manage-Screen, Play-Button.
+v1.2.1: Install-Button im Header hinzugefügt.
+v1.2.2:
+- SVG-Pfad repariert (Icons nun sichtbar).
+- PWA Debug-Status im Manage-Screen hinzugefügt.
+- Button-Vorschau-Modus für Entwicklungs-Check implementiert.
+- Kleinere Text-Anpassungen im Done-Screen.
 -->
