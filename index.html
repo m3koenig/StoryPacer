@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Pacer - v1.2.3</title>
+    <title>Story Pacer - v1.2.4</title>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,11 +74,13 @@
                     <p class="text-slate-400 text-sm">Übe das Erzählen ohne Hektik. Trenne Aufbau von Handlung und lerne, Pausen auszuhalten.</p>
                 </div>
                 
-                <p id="url-story-hint" class="text-sm text-emerald-400 font-medium hidden">📌 Custom-Szenario aktiv!</p>
+                <div id="status-container" class="space-y-2 w-full">
+                    <p id="url-story-hint" class="text-[10px] text-emerald-400 font-medium hidden bg-emerald-500/10 py-1 px-2 rounded-full inline-block">📌 Aktive URL-Story geladen</p>
+                    <p id="pool-size-hint" class="text-[10px] text-indigo-300 font-medium bg-indigo-500/10 py-1 px-2 rounded-full hidden">📚 Pool: <span id="pool-count">0</span> Szenarien</p>
+                </div>
 
-                <!-- PWA INSTALL PROMPT (Visible only when supported) -->
                 <button id="home-install-btn" class="hidden bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/50 py-2 px-4 rounded-lg transition-all w-full text-xs font-bold flex items-center justify-center gap-2">
-                    <span>📲</span> App auf dem Startbildschirm installieren
+                    <span>📲</span> App installieren
                 </button>
 
                 <div class="w-full space-y-3">
@@ -106,18 +108,7 @@
                 </div>
 
                 <div class="w-full space-y-6">
-                    <!-- PWA Debug (Advanced Info) -->
                     <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <p class="text-xs text-slate-500 uppercase font-bold">PWA Status & Diagnose</p>
-                        <div id="pwa-debug-info" class="text-[10px] space-y-1 font-mono text-slate-400">
-                            <p>Prüfe System-Voraussetzungen...</p>
-                        </div>
-                        <button onclick="forceInstallButton()" class="text-[10px] bg-slate-700 hover:bg-slate-600 text-slate-300 py-1 px-3 rounded transition-colors w-full">
-                            Install-Button Test-Einblendung
-                        </button>
-                    </div>
-
-                    <div class="space-y-3">
                         <p class="text-xs text-slate-500 uppercase font-bold px-1">Import</p>
                         <label for="json-import" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 border border-slate-600 border-dashed font-medium py-3 px-4 rounded-lg transition-colors w-full text-sm">
                             <span>📁 Datei laden</span>
@@ -129,7 +120,17 @@
                         </button>
                     </div>
 
-                    <p id="import-status" class="text-xs h-4 hidden transition-opacity text-center"></p>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <p class="text-xs text-slate-500 uppercase font-bold">System & PWA</p>
+                        <div id="pwa-debug-info" class="text-[10px] space-y-1 font-mono text-slate-400">
+                            <p>Status wird geprüft...</p>
+                        </div>
+                        <button onclick="forceInstallButton()" class="text-[10px] bg-slate-700 hover:bg-slate-600 text-slate-300 py-1 px-3 rounded transition-colors w-full">
+                            Button Test-Einblendung
+                        </button>
+                    </div>
+
+                    <p id="import-status" class="text-xs h-4 hidden transition-opacity text-center font-bold"></p>
                 </div>
             </div>
 
@@ -143,14 +144,9 @@
                 </div>
 
                 <div class="space-y-6 text-sm text-slate-300">
-                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                        <h3 class="text-white font-bold text-base mb-2">Installation</h3>
-                        <p class="mb-2 leading-relaxed">Wenn kein Button erscheint:</p>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-slate-400">
-                            <li><strong>iOS (Safari):</strong> Teilen-Icon → "Zum Home-Bildschirm".</li>
-                            <li><strong>Android (Chrome):</strong> Drei Punkte → "App installieren".</li>
-                            <li><strong>Vorschaufenster:</strong> PWA-Installation wird oft in Chat-Vorschauen blockiert. Nutze den direkten GitHub-Link.</li>
-                        </ul>
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700 leading-relaxed">
+                        <h3 class="text-white font-bold text-base mb-2">Importierte Szenarien</h3>
+                        <p>Sobald du neue Szenarien lädst, werden diese dem Zufallspool hinzugefügt. Jede neue Runde wählt dann automatisch einen Text aus allen verfügbaren aus.</p>
                     </div>
                 </div>
             </div>
@@ -162,7 +158,7 @@
                     <div class="absolute w-16 h-16 bg-indigo-500 rounded-full animate-breathe"></div>
                     <div class="absolute w-4 h-4 bg-white rounded-full"></div>
                 </div>
-                <p class="text-slate-500 text-sm">Bereite dich vor. Die Luft muss raus.</p>
+                <p class="text-slate-500 text-sm italic">Fokus finden...</p>
             </div>
 
             <!-- SETUP SCREEN (45s) -->
@@ -229,8 +225,9 @@
             <div id="screen-done" class="screen flex-col items-center justify-center text-center gap-6 h-full">
                 <span class="text-5xl">✅</span>
                 <h2 class="text-2xl font-bold">Gut gemacht.</h2>
-                <button onclick="resetApp()" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-lg transition-colors w-full">
-                    Neue Runde
+                <p id="pool-info-done" class="text-xs text-slate-500 hidden italic">Szenario aus deinem Pool abgeschlossen.</p>
+                <button onclick="resetApp()" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-xl transition-all w-full active:scale-95">
+                    Nächstes zufälliges Szenario
                 </button>
             </div>
 
@@ -239,28 +236,23 @@
 
     <script>
         /**
-         * PWA & Install Logic
+         * PWA & System Logic
          */
         let deferredPrompt;
         const homeInstallBtn = document.getElementById('home-install-btn');
         const debugInfo = document.getElementById('pwa-debug-info');
 
-        // Check environment constraints
         function updateDebug() {
             if(!debugInfo) return;
             const isHttps = window.location.protocol === 'https:';
             const isIframe = window.self !== window.top;
-            const hasSW = 'serviceWorker' in navigator;
-            
             debugInfo.innerHTML = `
                 <p>Protokoll: ${isHttps ? '✅ HTTPS' : '❌ Kein HTTPS'}</p>
-                <p>Kontext: ${isIframe ? '⚠️ Iframe (Blockiert Install-Event)' : '✅ Hauptfenster'}</p>
-                <p>Browser-SW: ${hasSW ? '✅ Vorhanden' : '❌ Nicht unterstützt'}</p>
-                <p>Install-Event: ${deferredPrompt ? '✅ Aktiviert' : '⏳ Warte auf Browser...'}</p>
+                <p>Kontext: ${isIframe ? '⚠️ Iframe (Blockiert)' : '✅ Hauptfenster'}</p>
+                <p>SW: ${'serviceWorker' in navigator ? '✅ Aktiv' : '❌ Inaktiv'}</p>
             `;
         }
 
-        // Initialize Manifest
         const manifest = {
             "name": "Story Pacer",
             "short_name": "StoryPacer",
@@ -272,7 +264,6 @@
         };
         document.getElementById('pwa-manifest').setAttribute('href', 'data:application/json,' + JSON.stringify(manifest));
 
-        // Listen for PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -288,31 +279,18 @@
             deferredPrompt = null;
         });
 
-        window.addEventListener('appinstalled', () => {
-            homeInstallBtn.classList.add('hidden');
-            deferredPrompt = null;
-            updateDebug();
-        });
-
         function forceInstallButton() {
             homeInstallBtn.classList.toggle('hidden');
         }
 
-        // Service Worker
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
-            const swCode = `
-                const CACHE_NAME = 'story-pacer-v1.2.3';
-                self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME)));
-                self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
-            `;
-            try {
-                const blob = new Blob([swCode], { type: 'text/javascript' });
-                navigator.serviceWorker.register(URL.createObjectURL(blob));
-            } catch (e) { console.error(e); }
+            const swCode = `self.addEventListener('fetch', e => {});`; // Minimal SW
+            const blob = new Blob([swCode], { type: 'text/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
         }
 
         /**
-         * App Logic
+         * App Logic & Pool Management
          */
         let prompts = [
             "Du stehst nachts allein an einer verlassenen Bushaltestelle mitten im Wald.",
@@ -334,21 +312,37 @@
             "Ein prunkvoller Ballsaal voller Kerzen, aber ohne Gäste."
         ];
 
+        let initialPoolSize = prompts.length;
         let currentInterval;
         let currentPrompt = "";
+        let urlStoryUsed = false;
+
         const urlParams = new URLSearchParams(window.location.search);
-        const storyParam = urlParams.get('story') || urlParams.get('Story');
+        let storyParam = urlParams.get('story') || urlParams.get('Story');
         
         window.onload = () => {
-            if (storyParam && storyParam.trim() !== '') document.getElementById('url-story-hint').classList.remove('hidden');
+            if (storyParam && storyParam.trim() !== '') {
+                document.getElementById('url-story-hint').classList.remove('hidden');
+            }
+            updatePoolHint();
             updateDebug();
         };
+
+        function updatePoolHint() {
+            const hint = document.getElementById('pool-size-hint');
+            const count = document.getElementById('pool-count');
+            if (prompts.length > initialPoolSize) {
+                hint.classList.remove('hidden');
+                count.innerText = prompts.length;
+            }
+        }
 
         function addPromptsToPool(data) {
             let n = Array.isArray(data) ? data : (data.prompts || []);
             n = n.filter(p => typeof p === 'string' && p.trim() !== '');
-            if (!n.length) throw "Keine Texte";
+            if (!n.length) throw "Leer";
             prompts = [...prompts, ...n];
+            updatePoolHint();
             return n.length;
         }
 
@@ -360,15 +354,23 @@
         }
 
         function handleTextImport() {
-            try { addPromptsToPool(JSON.parse(document.getElementById('json-text-input').value)); showStatus("Erfolgreich!"); } 
-            catch (e) { showStatus("Fehler", true); }
+            try { 
+                const count = addPromptsToPool(JSON.parse(document.getElementById('json-text-input').value)); 
+                showStatus(`${count} neue Szenarien geladen!`); 
+                document.getElementById('json-text-input').value = '';
+            } catch (e) { showStatus("Fehler im JSON-Format", true); }
         }
 
         function handleImport(e) {
             const f = e.target.files[0];
             if(!f) return;
             const r = new FileReader();
-            r.onload = (ev) => { try { addPromptsToPool(JSON.parse(ev.target.result)); showStatus("Erfolgreich!"); } catch(e) { showStatus("Fehler", true); }};
+            r.onload = (ev) => { 
+                try { 
+                    const count = addPromptsToPool(JSON.parse(ev.target.result)); 
+                    showStatus(`${count} geladen!`); 
+                } catch(e) { showStatus("Datei ungültig", true); }
+            };
             r.readAsText(f);
         }
 
@@ -379,46 +381,71 @@
         }
 
         function startSession() {
-            currentPrompt = storyParam ? decodeURIComponent(storyParam) : prompts[Math.floor(Math.random() * prompts.length)];
+            // Prioritize URL story only for the very first run
+            if (storyParam && !urlStoryUsed) {
+                currentPrompt = decodeURIComponent(storyParam);
+                urlStoryUsed = true; // Mark as used so next rounds are random
+                document.getElementById('url-story-hint').classList.add('opacity-50');
+            } else {
+                // Random pick from the entire pool (including imported ones)
+                const randomIndex = Math.floor(Math.random() * prompts.length);
+                currentPrompt = prompts[randomIndex];
+            }
+
             document.getElementById('prompt-text').innerText = currentPrompt;
             document.getElementById('prompt-text-action').innerText = currentPrompt;
+            
+            // Show if it's from the pool
+            if (prompts.length > initialPoolSize) {
+                document.getElementById('pool-info-done').classList.remove('hidden');
+            }
+
             showScreen('breathe');
             setTimeout(() => startSetupPhase(), 4000);
         }
 
         function startSetupPhase() { showScreen('setup'); runTimer('setup', 45, 'progress-setup', () => nextPhase('pause')); }
+        
         function startPausePhase() {
             showScreen('pause');
             let t = 3;
             document.getElementById('timer-pause').innerText = t;
             clearInterval(currentInterval);
-            currentInterval = setInterval(() => { t--; document.getElementById('timer-pause').innerText = t; if(t<=0){clearInterval(currentInterval); startActionPhase();}}, 1000);
+            currentInterval = setInterval(() => { 
+                t--; 
+                document.getElementById('timer-pause').innerText = t; 
+                if(t<=0){ clearInterval(currentInterval); startActionPhase(); }
+            }, 1000);
         }
+
         function startActionPhase() { showScreen('action'); runTimer('action', 45, 'progress-action', endSession); }
+
         function runTimer(p, s, id, cb) {
             clearInterval(currentInterval);
             let tl = s;
             const timer = document.getElementById(`timer-${p}`);
             const prog = document.getElementById(id);
-            currentInterval = setInterval(() => { tl--; timer.innerText = `${tl}s`; prog.style.width = `${(tl/s)*100}%`; if(tl<=0){clearInterval(currentInterval); cb();}}, 1000);
+            currentInterval = setInterval(() => { 
+                tl--; 
+                timer.innerText = `${tl}s`; 
+                prog.style.width = `${(tl/s)*100}%`; 
+                if(tl<=0){ clearInterval(currentInterval); cb(); }
+            }, 1000);
         }
+
         function nextPhase(p) { if(p === 'pause') startPausePhase(); }
         function endSession() { showScreen('done'); }
         function resetApp() { showScreen('home'); }
-        function downloadSchema() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(["Szenario 1"], null, 2));
-            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "vorlage.json"); dl.click();
-        }
     </script>
 </body>
 </html>
 
 <!-- 
 CHANGE LOG
-v1.0.0 bis v1.2.2: Initialer Prototyp, PWA-Support, GUI-Cleanup.
-v1.2.3:
-- PWA-Installations-Button prominenter auf der Startseite platziert.
-- Diagnose-Tool im Manage-Screen hinzugefügt (zeigt an, warum Installation evtl. blockiert wird).
-- Manifest-Generierung optimiert.
-- Iframe-Prüfung integriert, da Browser Installationen in Iframes oft blockieren.
+v1.0.0 bis v1.2.3: Initialer Prototyp, PWA-Support, GUI-Cleanup, Install-Button.
+v1.2.4:
+- Logik-Anpassung: Neue Runden nach dem Import nutzen nun konsequent den gesamten Pool (Zufallsprinzip).
+- URL-Parameter-Fix: "story"-Parameter wird nur noch beim allerersten Start priorisiert; Folgerunden ziehen zufällig aus dem Pool.
+- Pool-Statusanzeige: Zeigt auf dem Homescreen an, wie viele Szenarien aktuell geladen sind, wenn der Standardpool erweitert wurde.
+- UI-Refinement: "Nächstes zufälliges Szenario" Button im Done-Screen für besseren Flow.
 -->
