@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Pacer - v1.3.0</title>
+    <title>Story Pacer - v1.3.3</title>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,8 +74,10 @@
                     <p class="text-slate-400 text-sm">Übe das Erzählen ohne Hektik. Trenne Aufbau von Handlung und lerne, Pausen auszuhalten.</p>
                 </div>
                 
-                <div id="status-container" class="space-y-2 w-full">
-                    <p id="url-story-hint" class="text-[10px] text-emerald-400 font-medium hidden bg-emerald-500/10 py-1 px-2 rounded-full inline-block">📌 URL-Story aktiv (Priorität)</p>
+                <div id="status-container" class="space-y-2 w-full flex flex-col items-center">
+                    <p id="url-story-hint" class="text-[10px] text-emerald-400 font-bold hidden bg-emerald-500/20 border border-emerald-500/30 py-1.5 px-3 rounded-full animate-pulse">
+                        📌 URL-Story geladen (Nächster Start)
+                    </p>
                     <div id="pool-mode-status" class="text-[10px] py-1 px-3 rounded-full inline-block font-bold transition-all bg-slate-700/50 text-slate-400">
                         Pool: Standard-Szenarien
                     </div>
@@ -96,7 +98,7 @@
                 </div>
 
                 <button onclick="showScreen('help')" class="text-slate-500 hover:text-slate-300 text-xs underline decoration-slate-700 underline-offset-4 transition-colors">
-                    Hilfe & Anleitung
+                    Konzept & Anleitung
                 </button>
             </div>
 
@@ -110,20 +112,37 @@
                 </div>
 
                 <div class="w-full space-y-6">
-                    <div class="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/30 space-y-2">
-                        <p class="text-xs text-indigo-300 font-bold">Wichtiger Hinweis:</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed italic">Sobald du neue Szenarien importierst, wird der Standard-Pool gelöscht und nur noch deine Daten verwendet. Die App bleibt im exklusiven Modus, bis die Seite neu geladen wird.</p>
+                    <!-- SHARE LINK GENERATOR -->
+                    <div class="bg-indigo-900/10 p-4 rounded-xl border border-indigo-500/20 space-y-3">
+                        <p class="text-xs text-indigo-400 uppercase font-bold px-1 flex items-center gap-2">
+                            <span>🔗</span> Einzelne Story teilen
+                        </p>
+                        <input type="text" id="share-input" placeholder="Eigene Story hier schreiben..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <button onclick="generateShareLink()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg transition-colors text-xs w-full font-bold">
+                            Teilen-Link generieren
+                        </button>
+                        
+                        <div id="share-result-container" class="hidden space-y-2 pt-2 animate-in fade-in duration-300">
+                            <p class="text-[10px] text-slate-400">Dein Link:</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="share-url-output" readonly class="flex-1 bg-slate-950 border border-slate-700 rounded p-2 text-[10px] font-mono text-emerald-400">
+                                <button onclick="copyToClipboard()" class="bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs" title="Kopieren">
+                                    📋
+                                </button>
+                            </div>
+                            <p id="copy-feedback" class="text-[9px] text-emerald-500 text-right opacity-0 transition-opacity">Kopiert!</p>
+                        </div>
                     </div>
 
-                    <div class="space-y-3">
-                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Import (Datei)</p>
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Pool Import (Datei)</p>
                         <label for="json-import" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 border border-slate-600 border-dashed font-medium py-3 px-4 rounded-lg transition-colors w-full text-sm">
                             <span>📁 .json laden & ersetzen</span>
                             <input type="file" id="json-import" accept=".json" class="hidden" onchange="handleImport(event)">
                         </label>
                         
-                        <p class="text-xs text-slate-500 uppercase font-bold px-1 pt-2">Import (Text-Eingabe)</p>
-                        <textarea id="json-text-input" placeholder='["Dein Text A", "Dein Text B"]' class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-indigo-300 h-24 focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                        <p class="text-xs text-slate-500 uppercase font-bold px-1 pt-2">Pool Import (Text-Eingabe)</p>
+                        <textarea id="json-text-input" placeholder='["Story 1", "Story 2"]' class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-indigo-300 h-24 focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
                         <button onclick="handleTextImport()" class="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/50 py-2 px-4 rounded-lg transition-colors text-xs w-full font-bold">
                             Importieren & Pool ersetzen
                         </button>
@@ -139,43 +158,62 @@
                     <button onclick="showScreen('home')" class="text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         ←
                     </button>
-                    <h2 class="text-xl font-bold">Hilfe</h2>
+                    <h2 class="text-xl font-bold">Das VAKOG-Prinzip</h2>
                 </div>
 
                 <div class="space-y-6 text-sm text-slate-300 leading-relaxed">
+                    <div class="bg-indigo-900/20 p-4 rounded-lg border border-indigo-500/30">
+                        <h3 class="text-white font-bold text-base mb-2">Die Idee dahinter</h3>
+                        <p class="mb-3">Dieses Tool basiert auf dem **VAKOG-Modell** aus der Kommunikationspsychologie. Um eine Geschichte wirklich fesselnd zu gestalten, müssen wir alle Sinneskanäle ansprechen:</p>
+                        <ul class="space-y-2">
+                            <li><strong class="text-indigo-400">V - Visuell:</strong> Was siehst du? Farben, Licht, Schatten, Details.</li>
+                            <li><strong class="text-indigo-400">A - Auditiv:</strong> Was hörst du? Wind, Stille, fernes Grollen, Knistern.</li>
+                            <li><strong class="text-indigo-400">K - Kinästhetisch:</strong> Was fühlst du? Temperatur, Textur, Gewicht, Wind auf der Haut.</li>
+                            <li><strong class="text-indigo-400">O - Olfaktorisch:</strong> Was riechst du? Moder, Frische, Verbranntes, süße Blumen.</li>
+                            <li><strong class="text-indigo-400">G - Gustatorisch:</strong> Was schmeckst du? Salzige Luft, Metall, Trockenheit.</li>
+                        </ul>
+                    </div>
+
                     <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                        <h3 class="text-white font-bold text-base mb-2">Exklusiver Import</h3>
-                        <p>In dieser Version (v1.3.0) werden beim Import alle Standard-Szenarien deaktiviert. Dies ermöglicht es dir, gezielt nur deine eigenen Story-Vorgaben zu trainieren.</p>
+                        <h3 class="text-white font-bold text-base mb-2">Anwendung</h3>
+                        <p class="mb-2">In **Phase 1 (Das Setup)** hast du 45 Sekunden Zeit, ausschließlich die Atmosphäre über diese Sinne aufzubauen. Erst nach der **Pause** darf die Handlung in Phase 2 folgen. Das verhindert hektisches Erzählen und schafft Tiefe.</p>
+                    </div>
+
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <h3 class="text-white font-bold text-base mb-2">Storys teilen & laden</h3>
+                        <p class="mb-2">Unter "Verwaltung" kannst du eigene Szenarien importieren oder einen Direkt-Link für ein einzelnes Szenario generieren.</p>
+                        <code class="bg-black/40 p-2 rounded text-[10px] block break-all text-emerald-400">?story=Dein Text hier</code>
                     </div>
                 </div>
             </div>
 
-            <!-- BREATHE SCREEN (4s) -->
+            <!-- BREATHE SCREEN -->
             <div id="screen-breathe" class="screen flex-col items-center justify-center text-center gap-8 h-full">
                 <h2 class="text-xl font-medium text-slate-300">Tief ausatmen.</h2>
                 <div class="relative flex items-center justify-center w-32 h-32">
                     <div class="absolute w-16 h-16 bg-indigo-500 rounded-full animate-breathe"></div>
                     <div class="absolute w-4 h-4 bg-white rounded-full"></div>
                 </div>
-                <p class="text-slate-500 text-sm">Fokus finden...</p>
+                <p class="text-slate-500 text-sm italic">Präsenz finden...</p>
             </div>
 
-            <!-- SETUP SCREEN (45s) -->
+            <!-- SETUP SCREEN -->
             <div id="screen-setup" class="screen flex-col gap-6">
                 <div class="flex justify-between items-center text-sm font-medium text-indigo-400">
-                    <span>Phase 1: Das Setup</span>
+                    <span>Phase 1: Das Setup (VAKOG)</span>
                     <span id="timer-setup" class="bg-indigo-500/20 px-2 py-1 rounded">45s</span>
                 </div>
                 <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
                     <p class="text-xs text-slate-500 uppercase font-bold mb-2">Dein Szenario</p>
                     <p id="prompt-text" class="font-medium text-lg leading-snug"></p>
                 </div>
-                <div class="space-y-3 text-center">
-                    <p class="text-sm text-slate-400">Beschreibe <span class="text-white font-bold">nur</span> die Umgebung.</p>
+                <!-- SENSES HINTS: Fühlen/Riechen/Schmecken implied -->
+                <div class="space-y-3">
+                    <p class="text-sm text-slate-400 text-center">Beschreibe <span class="text-white font-bold">nur</span> die Umgebung. Nutze deine Sinne:</p>
                     <div class="flex gap-2">
-                        <div class="flex-1 bg-slate-700/30 p-2 rounded text-xs">👁️ Sehen</div>
-                        <div class="flex-1 bg-slate-700/30 p-2 rounded text-xs">👂 Hören</div>
-                        <div class="flex-1 bg-slate-700/30 p-2 rounded text-xs">✋ Fühlen</div>
+                        <div class="flex-1 bg-slate-700/50 p-3 rounded text-center" title="Visuell"><span class="text-xl block mb-1">👁️</span><span class="text-[10px] text-slate-300">Sehen</span></div>
+                        <div class="flex-1 bg-slate-700/50 p-3 rounded text-center" title="Auditiv"><span class="text-xl block mb-1">👂</span><span class="text-[10px] text-slate-300">Hören</span></div>
+                        <div class="flex-1 bg-slate-700/50 p-3 rounded text-center" title="Kinästhetisch/Olfaktorisch"><span class="text-xl block mb-1">✋</span><span class="text-[10px] text-slate-300">Fühlen/Riechen</span></div>
                     </div>
                 </div>
                 <div class="mt-auto">
@@ -188,7 +226,7 @@
                 </div>
             </div>
 
-            <!-- PAUSE SCREEN (3s) -->
+            <!-- PAUSE SCREEN -->
             <div id="screen-pause" class="screen flex-col items-center justify-center text-center gap-6 h-full">
                 <div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center border-2 border-rose-500">
                     <span class="text-3xl">🛑</span>
@@ -197,7 +235,7 @@
                 <div class="text-5xl font-bold text-white mt-4" id="timer-pause">3</div>
             </div>
 
-            <!-- ACTION SCREEN (45s) -->
+            <!-- ACTION SCREEN -->
             <div id="screen-action" class="screen flex-col gap-6">
                 <div class="flex justify-between items-center text-sm font-medium text-emerald-400">
                     <span>Phase 2: Die Handlung</span>
@@ -206,10 +244,7 @@
                 <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
                     <p id="prompt-text-action" class="text-sm text-slate-400 italic"></p>
                 </div>
-                <div class="py-8 text-center">
-                    <span class="text-5xl block mb-4">🎬</span>
-                    <p class="text-xl">Was geschieht jetzt?</p>
-                </div>
+                <div class="py-8 text-center text-5xl">🎬</div>
                 <div class="mt-auto">
                     <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden mb-4">
                         <div id="progress-action" class="bg-emerald-500 h-full w-full progress-bar"></div>
@@ -224,7 +259,6 @@
             <div id="screen-done" class="screen flex-col items-center justify-center text-center gap-6 h-full">
                 <span class="text-5xl">✅</span>
                 <h2 class="text-2xl font-bold">Gut gemacht.</h2>
-                <p id="pool-info-done" class="text-xs text-indigo-400 hidden italic">Szenario aus deinem exklusiven Pool abgeschlossen.</p>
                 <button onclick="resetApp()" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-xl transition-all w-full active:scale-95">
                     Nächste Runde
                 </button>
@@ -288,7 +322,7 @@
             "Eine Holzhütte im verschneiten Gebirge, das Feuer erlischt.",
             "Der Warteraum eines abgelegenen Bahnhofs tief in der Nacht.",
             "Du betrittst einen dunklen Keller mit knöcheltiefem Wasser.",
-            "Ein Gewächshaus, in dem exotische Pflanzen alles verschlingen.",
+            "Ein Gewächshaus, in dem exotische Pflanzen wuchern und alles verschlingen.",
             "Du wachst in einer Höhle mit leuchtenden Pilzen auf.",
             "Eine enge, regnerische Gasse mit flackernder Neonröhre.",
             "Ein prunkvoller Ballsaal voller Kerzen, aber ohne Gäste.",
@@ -320,8 +354,10 @@
         
         window.onload = () => {
             if (storyParam && storyParam.trim() !== '') {
-                document.getElementById('url-story-hint').classList.remove('hidden');
+                const hint = document.getElementById('url-story-hint');
+                hint.classList.remove('hidden');
             }
+            updatePoolStatus();
         };
 
         function updatePoolStatus() {
@@ -329,21 +365,36 @@
             if (usingBasePool) {
                 statusEl.innerText = "Pool: Standard-Szenarien";
                 statusEl.className = "text-[10px] py-1 px-3 rounded-full inline-block font-bold bg-slate-700/50 text-slate-400";
-                document.getElementById('pool-info-done').classList.add('hidden');
             } else {
                 statusEl.innerText = `Pool: ${prompts.length} Eigene Szenarien`;
                 statusEl.className = "text-[10px] py-1 px-3 rounded-full inline-block font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30";
-                document.getElementById('pool-info-done').classList.remove('hidden');
             }
+        }
+
+        function generateShareLink() {
+            const text = document.getElementById('share-input').value.trim();
+            if (!text) return;
+            const baseUrl = window.location.href.split('?')[0];
+            const fullUrl = `${baseUrl}?story=${encodeURIComponent(text)}`;
+            const output = document.getElementById('share-url-output');
+            output.value = fullUrl;
+            document.getElementById('share-result-container').classList.remove('hidden');
+        }
+
+        function copyToClipboard() {
+            const copyText = document.getElementById('share-url-output');
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            const feedback = document.getElementById('copy-feedback');
+            feedback.style.opacity = '1';
+            setTimeout(() => feedback.style.opacity = '0', 2000);
         }
 
         function setExlusivePool(data) {
             let n = Array.isArray(data) ? data : (data.prompts || []);
             n = n.filter(p => typeof p === 'string' && p.trim() !== '');
-            
             if (!n.length) throw "Keine gültigen Texte gefunden";
-
-            // Replace instead of append
             prompts = [...n];
             usingBasePool = false;
             updatePoolStatus();
@@ -360,7 +411,7 @@
         function handleTextImport() {
             try { 
                 const count = setExlusivePool(JSON.parse(document.getElementById('json-text-input').value)); 
-                showStatus(`${count} eigene Szenarien geladen! Standard-Pool wurde ersetzt.`); 
+                showStatus(`${count} Szenarien geladen! Standard-Pool ersetzt.`); 
                 document.getElementById('json-text-input').value = '';
             } catch (e) { showStatus("Fehler: JSON ungültig", true); }
         }
@@ -387,7 +438,9 @@
             if (storyParam && !urlStoryUsed) {
                 currentPrompt = decodeURIComponent(storyParam);
                 urlStoryUsed = true;
-                document.getElementById('url-story-hint').classList.add('opacity-50');
+                const hint = document.getElementById('url-story-hint');
+                hint.innerText = "📌 URL-Story abgeschlossen";
+                hint.className = "text-[10px] text-slate-500 font-medium bg-slate-700/30 py-1.5 px-3 rounded-full";
             } else {
                 const randomIndex = Math.floor(Math.random() * prompts.length);
                 currentPrompt = prompts[randomIndex];
@@ -437,9 +490,9 @@
 
 <!-- 
 CHANGE LOG
-v1.3.0:
-- Exklusiv-Modus für Importe: Sobald Szenarien geladen werden, wird der Standard-Pool (basePrompts) gelöscht.
-- UI-Anpassung: Status-Badge auf dem Home-Screen zeigt an, ob der Standard-Pool oder der exklusive Import-Pool aktiv ist.
-- Import-Feedback verbessert: Klare Meldung, dass der Pool nun ersetzt wurde.
-- Alle 15 neuen Basisszenarien aus v1.2.5 bleiben als Standard erhalten, solange kein Import stattfindet.
+v1.3.3:
+- VAKOG-Konzept tiefgreifend im Hilfe-Screen integriert und erklärt.
+- Senses-Labels im Setup-Screen auf "Fühlen/Riechen" präzisiert.
+- Anleitung um Sektionen für Teilen, Import und pädagogisches Konzept erweitert.
+- Konsolidierung aller Features aus v1.3.2.
 -->
