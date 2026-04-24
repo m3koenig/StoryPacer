@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Pacer - v1.2.4</title>
+    <title>Story Pacer - v1.3.0</title>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -75,8 +75,10 @@
                 </div>
                 
                 <div id="status-container" class="space-y-2 w-full">
-                    <p id="url-story-hint" class="text-[10px] text-emerald-400 font-medium hidden bg-emerald-500/10 py-1 px-2 rounded-full inline-block">📌 Aktive URL-Story geladen</p>
-                    <p id="pool-size-hint" class="text-[10px] text-indigo-300 font-medium bg-indigo-500/10 py-1 px-2 rounded-full hidden">📚 Pool: <span id="pool-count">0</span> Szenarien</p>
+                    <p id="url-story-hint" class="text-[10px] text-emerald-400 font-medium hidden bg-emerald-500/10 py-1 px-2 rounded-full inline-block">📌 URL-Story aktiv (Priorität)</p>
+                    <div id="pool-mode-status" class="text-[10px] py-1 px-3 rounded-full inline-block font-bold transition-all bg-slate-700/50 text-slate-400">
+                        Pool: Standard-Szenarien
+                    </div>
                 </div>
 
                 <button id="home-install-btn" class="hidden bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/50 py-2 px-4 rounded-lg transition-all w-full text-xs font-bold flex items-center justify-center gap-2">
@@ -108,25 +110,22 @@
                 </div>
 
                 <div class="w-full space-y-6">
-                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Import</p>
-                        <label for="json-import" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 border border-slate-600 border-dashed font-medium py-3 px-4 rounded-lg transition-colors w-full text-sm">
-                            <span>📁 Datei laden</span>
-                            <input type="file" id="json-import" accept=".json" class="hidden" onchange="handleImport(event)">
-                        </label>
-                        <textarea id="json-text-input" placeholder='["Szenario A", "Szenario B"]' class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-indigo-300 h-24 focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
-                        <button onclick="handleTextImport()" class="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/50 py-2 px-4 rounded-lg transition-colors text-xs w-full font-bold">
-                            Text laden
-                        </button>
+                    <div class="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/30 space-y-2">
+                        <p class="text-xs text-indigo-300 font-bold">Wichtiger Hinweis:</p>
+                        <p class="text-[11px] text-slate-400 leading-relaxed italic">Sobald du neue Szenarien importierst, wird der Standard-Pool gelöscht und nur noch deine Daten verwendet. Die App bleibt im exklusiven Modus, bis die Seite neu geladen wird.</p>
                     </div>
 
-                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700 space-y-3">
-                        <p class="text-xs text-slate-500 uppercase font-bold">System & PWA</p>
-                        <div id="pwa-debug-info" class="text-[10px] space-y-1 font-mono text-slate-400">
-                            <p>Status wird geprüft...</p>
-                        </div>
-                        <button onclick="forceInstallButton()" class="text-[10px] bg-slate-700 hover:bg-slate-600 text-slate-300 py-1 px-3 rounded transition-colors w-full">
-                            Button Test-Einblendung
+                    <div class="space-y-3">
+                        <p class="text-xs text-slate-500 uppercase font-bold px-1">Import (Datei)</p>
+                        <label for="json-import" class="cursor-pointer flex items-center justify-center gap-2 bg-slate-700/30 hover:bg-slate-700/50 text-slate-300 border border-slate-600 border-dashed font-medium py-3 px-4 rounded-lg transition-colors w-full text-sm">
+                            <span>📁 .json laden & ersetzen</span>
+                            <input type="file" id="json-import" accept=".json" class="hidden" onchange="handleImport(event)">
+                        </label>
+                        
+                        <p class="text-xs text-slate-500 uppercase font-bold px-1 pt-2">Import (Text-Eingabe)</p>
+                        <textarea id="json-text-input" placeholder='["Dein Text A", "Dein Text B"]' class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-indigo-300 h-24 focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                        <button onclick="handleTextImport()" class="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/50 py-2 px-4 rounded-lg transition-colors text-xs w-full font-bold">
+                            Importieren & Pool ersetzen
                         </button>
                     </div>
 
@@ -143,10 +142,10 @@
                     <h2 class="text-xl font-bold">Hilfe</h2>
                 </div>
 
-                <div class="space-y-6 text-sm text-slate-300">
-                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700 leading-relaxed">
-                        <h3 class="text-white font-bold text-base mb-2">Importierte Szenarien</h3>
-                        <p>Sobald du neue Szenarien lädst, werden diese dem Zufallspool hinzugefügt. Jede neue Runde wählt dann automatisch einen Text aus allen verfügbaren aus.</p>
+                <div class="space-y-6 text-sm text-slate-300 leading-relaxed">
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <h3 class="text-white font-bold text-base mb-2">Exklusiver Import</h3>
+                        <p>In dieser Version (v1.3.0) werden beim Import alle Standard-Szenarien deaktiviert. Dies ermöglicht es dir, gezielt nur deine eigenen Story-Vorgaben zu trainieren.</p>
                     </div>
                 </div>
             </div>
@@ -158,7 +157,7 @@
                     <div class="absolute w-16 h-16 bg-indigo-500 rounded-full animate-breathe"></div>
                     <div class="absolute w-4 h-4 bg-white rounded-full"></div>
                 </div>
-                <p class="text-slate-500 text-sm italic">Fokus finden...</p>
+                <p class="text-slate-500 text-sm">Fokus finden...</p>
             </div>
 
             <!-- SETUP SCREEN (45s) -->
@@ -225,9 +224,9 @@
             <div id="screen-done" class="screen flex-col items-center justify-center text-center gap-6 h-full">
                 <span class="text-5xl">✅</span>
                 <h2 class="text-2xl font-bold">Gut gemacht.</h2>
-                <p id="pool-info-done" class="text-xs text-slate-500 hidden italic">Szenario aus deinem Pool abgeschlossen.</p>
+                <p id="pool-info-done" class="text-xs text-indigo-400 hidden italic">Szenario aus deinem exklusiven Pool abgeschlossen.</p>
                 <button onclick="resetApp()" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-8 rounded-xl transition-all w-full active:scale-95">
-                    Nächstes zufälliges Szenario
+                    Nächste Runde
                 </button>
             </div>
 
@@ -240,18 +239,6 @@
          */
         let deferredPrompt;
         const homeInstallBtn = document.getElementById('home-install-btn');
-        const debugInfo = document.getElementById('pwa-debug-info');
-
-        function updateDebug() {
-            if(!debugInfo) return;
-            const isHttps = window.location.protocol === 'https:';
-            const isIframe = window.self !== window.top;
-            debugInfo.innerHTML = `
-                <p>Protokoll: ${isHttps ? '✅ HTTPS' : '❌ Kein HTTPS'}</p>
-                <p>Kontext: ${isIframe ? '⚠️ Iframe (Blockiert)' : '✅ Hauptfenster'}</p>
-                <p>SW: ${'serviceWorker' in navigator ? '✅ Aktiv' : '❌ Inaktiv'}</p>
-            `;
-        }
 
         const manifest = {
             "name": "Story Pacer",
@@ -268,7 +255,6 @@
             e.preventDefault();
             deferredPrompt = e;
             homeInstallBtn.classList.remove('hidden');
-            updateDebug();
         });
 
         homeInstallBtn.addEventListener('click', async () => {
@@ -279,12 +265,8 @@
             deferredPrompt = null;
         });
 
-        function forceInstallButton() {
-            homeInstallBtn.classList.toggle('hidden');
-        }
-
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
-            const swCode = `self.addEventListener('fetch', e => {});`; // Minimal SW
+            const swCode = `self.addEventListener('fetch', e => {});`; 
             const blob = new Blob([swCode], { type: 'text/javascript' });
             navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
         }
@@ -292,7 +274,7 @@
         /**
          * App Logic & Pool Management
          */
-        let prompts = [
+        const basePrompts = [
             "Du stehst nachts allein an einer verlassenen Bushaltestelle mitten im Wald.",
             "Du betrittst ein uraltes Antiquariat, das seit Jahren verschlossen war.",
             "Du wachst auf einem kleinen Holzboot mitten auf dem Ozean auf.",
@@ -309,10 +291,26 @@
             "Ein Gewächshaus, in dem exotische Pflanzen alles verschlingen.",
             "Du wachst in einer Höhle mit leuchtenden Pilzen auf.",
             "Eine enge, regnerische Gasse mit flackernder Neonröhre.",
-            "Ein prunkvoller Ballsaal voller Kerzen, aber ohne Gäste."
+            "Ein prunkvoller Ballsaal voller Kerzen, aber ohne Gäste.",
+            "Du stehst in einer Gefängniszelle, deren Tür weit offen steht.",
+            "Du sitzt am Steuer eines Raumschiffs, das lautlos durch den interstellaren Raum treibt.",
+            "Du befindest dich in einer antiken Bibliothek, in der alle Regale leer sind.",
+            "Du wachst auf dem Boden eines prunkvollen Ballsaals auf.",
+            "Du stehst in einer Telefonzelle mitten in einer Wüste.",
+            "Du bist in einem Beichtstuhl und auf der anderen Seite atmet jemand.",
+            "Du befindest dich in einem Kontrollraum tief unter der Erde.",
+            "Du stehst auf einer hölzernen Hängebrücke, die im Nebel verschwindet.",
+            "Du sitzt in einem voll besetzten Kinosaal, aber der Film ist verstummt.",
+            "Du bist in einer Schmiede, in der ein unfertiges Schwert auf dem Amboss liegt.",
+            "Du stehst auf dem Dach eines Wolkenkratzers über den Wolken.",
+            "Du befindest dich in einem Gewächshaus voller abgestorbener Pflanzen.",
+            "Du bist in einer Garage und vor dir steht ein verhülltes Auto.",
+            "Du stehst in einem Kinderzimmer, in dem alle Spieluhren gleichzeitig laufen.",
+            "Du befindest dich in einem Tresorraum, in dem nur ein einzelner Schuh liegt."
         ];
 
-        let initialPoolSize = prompts.length;
+        let prompts = [...basePrompts];
+        let usingBasePool = true;
         let currentInterval;
         let currentPrompt = "";
         let urlStoryUsed = false;
@@ -324,25 +322,31 @@
             if (storyParam && storyParam.trim() !== '') {
                 document.getElementById('url-story-hint').classList.remove('hidden');
             }
-            updatePoolHint();
-            updateDebug();
         };
 
-        function updatePoolHint() {
-            const hint = document.getElementById('pool-size-hint');
-            const count = document.getElementById('pool-count');
-            if (prompts.length > initialPoolSize) {
-                hint.classList.remove('hidden');
-                count.innerText = prompts.length;
+        function updatePoolStatus() {
+            const statusEl = document.getElementById('pool-mode-status');
+            if (usingBasePool) {
+                statusEl.innerText = "Pool: Standard-Szenarien";
+                statusEl.className = "text-[10px] py-1 px-3 rounded-full inline-block font-bold bg-slate-700/50 text-slate-400";
+                document.getElementById('pool-info-done').classList.add('hidden');
+            } else {
+                statusEl.innerText = `Pool: ${prompts.length} Eigene Szenarien`;
+                statusEl.className = "text-[10px] py-1 px-3 rounded-full inline-block font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30";
+                document.getElementById('pool-info-done').classList.remove('hidden');
             }
         }
 
-        function addPromptsToPool(data) {
+        function setExlusivePool(data) {
             let n = Array.isArray(data) ? data : (data.prompts || []);
             n = n.filter(p => typeof p === 'string' && p.trim() !== '');
-            if (!n.length) throw "Leer";
-            prompts = [...prompts, ...n];
-            updatePoolHint();
+            
+            if (!n.length) throw "Keine gültigen Texte gefunden";
+
+            // Replace instead of append
+            prompts = [...n];
+            usingBasePool = false;
+            updatePoolStatus();
             return n.length;
         }
 
@@ -355,10 +359,10 @@
 
         function handleTextImport() {
             try { 
-                const count = addPromptsToPool(JSON.parse(document.getElementById('json-text-input').value)); 
-                showStatus(`${count} neue Szenarien geladen!`); 
+                const count = setExlusivePool(JSON.parse(document.getElementById('json-text-input').value)); 
+                showStatus(`${count} eigene Szenarien geladen! Standard-Pool wurde ersetzt.`); 
                 document.getElementById('json-text-input').value = '';
-            } catch (e) { showStatus("Fehler im JSON-Format", true); }
+            } catch (e) { showStatus("Fehler: JSON ungültig", true); }
         }
 
         function handleImport(e) {
@@ -367,8 +371,8 @@
             const r = new FileReader();
             r.onload = (ev) => { 
                 try { 
-                    const count = addPromptsToPool(JSON.parse(ev.target.result)); 
-                    showStatus(`${count} geladen!`); 
+                    const count = setExlusivePool(JSON.parse(ev.target.result)); 
+                    showStatus(`${count} geladen! Standard-Pool ersetzt.`); 
                 } catch(e) { showStatus("Datei ungültig", true); }
             };
             r.readAsText(f);
@@ -377,29 +381,20 @@
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(`screen-${id}`).classList.add('active');
-            updateDebug();
         }
 
         function startSession() {
-            // Prioritize URL story only for the very first run
             if (storyParam && !urlStoryUsed) {
                 currentPrompt = decodeURIComponent(storyParam);
-                urlStoryUsed = true; // Mark as used so next rounds are random
+                urlStoryUsed = true;
                 document.getElementById('url-story-hint').classList.add('opacity-50');
             } else {
-                // Random pick from the entire pool (including imported ones)
                 const randomIndex = Math.floor(Math.random() * prompts.length);
                 currentPrompt = prompts[randomIndex];
             }
 
             document.getElementById('prompt-text').innerText = currentPrompt;
             document.getElementById('prompt-text-action').innerText = currentPrompt;
-            
-            // Show if it's from the pool
-            if (prompts.length > initialPoolSize) {
-                document.getElementById('pool-info-done').classList.remove('hidden');
-            }
-
             showScreen('breathe');
             setTimeout(() => startSetupPhase(), 4000);
         }
@@ -442,10 +437,9 @@
 
 <!-- 
 CHANGE LOG
-v1.0.0 bis v1.2.3: Initialer Prototyp, PWA-Support, GUI-Cleanup, Install-Button.
-v1.2.4:
-- Logik-Anpassung: Neue Runden nach dem Import nutzen nun konsequent den gesamten Pool (Zufallsprinzip).
-- URL-Parameter-Fix: "story"-Parameter wird nur noch beim allerersten Start priorisiert; Folgerunden ziehen zufällig aus dem Pool.
-- Pool-Statusanzeige: Zeigt auf dem Homescreen an, wie viele Szenarien aktuell geladen sind, wenn der Standardpool erweitert wurde.
-- UI-Refinement: "Nächstes zufälliges Szenario" Button im Done-Screen für besseren Flow.
+v1.3.0:
+- Exklusiv-Modus für Importe: Sobald Szenarien geladen werden, wird der Standard-Pool (basePrompts) gelöscht.
+- UI-Anpassung: Status-Badge auf dem Home-Screen zeigt an, ob der Standard-Pool oder der exklusive Import-Pool aktiv ist.
+- Import-Feedback verbessert: Klare Meldung, dass der Pool nun ersetzt wurde.
+- Alle 15 neuen Basisszenarien aus v1.2.5 bleiben als Standard erhalten, solange kein Import stattfindet.
 -->
