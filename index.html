@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Pacer - v1.2.0</title>
+    <title>Story Pacer - v1.2.1</title>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -55,8 +55,15 @@
     <div class="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden min-h-[600px] flex flex-col relative border border-slate-700">
         
         <!-- Header -->
-        <div class="bg-slate-950 p-4 text-center border-b border-slate-700">
+        <div class="bg-slate-950 p-4 text-center border-b border-slate-700 flex justify-between items-center px-6">
+            <div class="w-8"></div> <!-- Spacer -->
             <h1 class="font-bold text-xl text-indigo-400 tracking-wide">Story Pacer</h1>
+            <!-- Small Install Button (Hidden by default) -->
+            <button id="pwa-install-btn" class="hidden text-indigo-400 hover:text-indigo-300 transition-colors" title="App installieren">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="箭4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+            </button>
         </div>
 
         <!-- Content Area -->
@@ -130,7 +137,6 @@
                 </div>
 
                 <div class="space-y-6 text-sm text-slate-300">
-                    <!-- JSON Section -->
                     <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                         <h3 class="text-white font-bold text-base mb-2">1. Eigene Szenarien</h3>
                         <p class="mb-3">Du kannst unter "Szenarien verwalten" eigene Texte laden. Das Format muss ein valides JSON-Array sein.</p>
@@ -145,7 +151,6 @@
                         </button>
                     </div>
 
-                    <!-- URL Section -->
                     <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
                         <h3 class="text-white font-bold text-base mb-2">2. Direkter URL-Link</h3>
                         <p class="mb-3">Hänge einen Text als Parameter an die URL an:</p>
@@ -254,13 +259,37 @@
 
     <script>
         /**
-         * PWA Service Worker Registration
-         * Note: Some browsers/environments block 'blob:' protocols for Service Workers.
-         * For a production PWA on GitHub Pages, it's recommended to create a real 'sw.js' file.
+         * PWA Service Worker & Install Logic
          */
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwa-install-btn');
+
+        // Capture the installation prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden'); // Show small install button in header
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            }
+            deferredPrompt = null;
+            installBtn.classList.add('hidden');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.add('hidden');
+            deferredPrompt = null;
+        });
+
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
             const swCode = `
-                const CACHE_NAME = 'story-pacer-v1.2.0';
+                const CACHE_NAME = 'story-pacer-v1.2.1';
                 self.addEventListener('install', e => {
                     e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./'])));
                 });
@@ -272,7 +301,7 @@
                 const blob = new Blob([swCode], { type: 'text/javascript' });
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl).catch(err => {
-                    console.warn("ServiceWorker Registration failed (likely due to blob: protocol restriction):", err);
+                    console.warn("ServiceWorker Registration failed:", err);
                 });
             } catch (e) {
                 console.error("ServiceWorker Initialization failed:", e);
@@ -303,7 +332,6 @@
         let currentInterval;
         let currentPrompt = "";
 
-        // Check URL for Custom Story Parameter
         const urlParams = new URLSearchParams(window.location.search);
         const storyParam = urlParams.get('story') || urlParams.get('Story');
         
@@ -313,7 +341,6 @@
             }
         };
 
-        // Download JSON Schema Template
         function downloadSchema() {
             const template = ["Szenario 1", "Szenario 2"];
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(template, null, 2));
@@ -323,7 +350,6 @@
             dl.click();
         }
 
-        // Shared Logic for Adding Prompts
         function addPromptsToPool(data) {
             let newPrompts = [];
             if (Array.isArray(data)) {
@@ -333,10 +359,8 @@
             } else {
                 throw new Error("Ungültiges Format");
             }
-
             newPrompts = newPrompts.filter(p => typeof p === 'string' && p.trim() !== '');
             if (newPrompts.length === 0) throw new Error("Keine Texte gefunden");
-
             prompts = [...prompts, ...newPrompts];
             return newPrompts.length;
         }
@@ -348,7 +372,6 @@
             setTimeout(() => statusEl.className = "text-xs h-4 hidden", 4000);
         }
 
-        // Text Import Logic
         function handleTextImport() {
             const input = document.getElementById('json-text-input').value;
             try {
@@ -361,7 +384,6 @@
             }
         }
 
-        // File Import Logic
         function handleImport(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -462,8 +484,9 @@ CHANGE LOG
 v1.0.0: Initialer Import des Story Pacer Prototyps.
 v1.1.0: PWA-Funktionalität und JSON-Texteingabe hinzugefügt.
 v1.1.1: Service Worker Registrierung nun fehlertolerant (try-catch).
-v1.2.0:
-- GUI-Cleanup: "Eigene Szenarien" in eigenen Screen "Manage" ausgelagert.
-- Start-Button zu "Play-Button"-Stil ("▶️ Session starten") geändert.
-- Home-Screen auf das Wesentliche reduziert.
+v1.2.0: GUI-Cleanup, "Eigene Szenarien" in eigenen Screen ausgelagert, Play-Button integriert.
+v1.2.1:
+- PWA Installation: "Install"-Button im Header hinzugefügt.
+- Button erscheint nur, wenn die App installierbar ist (via beforeinstallprompt).
+- Logik zum Auslösen des nativen Installationsdialogs implementiert.
 -->
