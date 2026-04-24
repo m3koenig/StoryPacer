@@ -16,7 +16,7 @@ The key insight: Separate scene-building from action to improve your storytellin
 ## Features
 
 - 🎙️ **Guided Storytelling** - Two-phase training with timers
-- 🎬 **17 Built-in Scenarios** - Atmospheric prompts to inspire you
+- 🎬 **Built-in Scenarios** - Atmospheric prompts to inspire you
 - 📁 **Custom Scenarios** - Import your own `.json` files
 - 🔗 **URL Sharing** - Share specific stories with others via URL parameters
 - 🌙 **Dark Theme** - Easy on the eyes during practice sessions
@@ -32,13 +32,10 @@ Visit [m3koenig.github.io/StoryPacer](https://m3koenig.github.io/StoryPacer) and
 # Clone the repository
 git clone https://github.com/m3koenig/StoryPacer.git
 cd StoryPacer
-
-# Serve locally (requires a local server)
-python -m http.server 8000
-# or use Live Server in VS Code
+ 
 ```
 
-Then open `http://localhost:8000` in your browser.
+Then open `index.html` in your browser.
 
 ## How to Use
 
@@ -74,7 +71,64 @@ https://m3koenig.github.io/StoryPacer/?story=You%20wake%20up%20in%20an%20old%20l
 
 Perfect for practice groups or teaching scenarios.
 
+
+## Crafting "Skeleton Prompts"
+
+While many prompts provide sensory details (VAKOG) to help the speaker, Skeleton Prompts take the opposite approach. They provide only the bare architectural minimum—a situation or a location—forcing the storyteller to generate every single sensory detail from scratch during Phase 1 (The Setup).
+
+1. The Core Philosophy: The Empty Stage
+
+A Skeleton Prompt is like an empty stage with only one prop. It defines where you are and what the basic situation is, but it deliberately ignores how it looks, sounds, or feels.
+
+VAKOG Prompt: "You stand in a cold, damp cellar where a single bulb flickers overhead."
+
+Skeleton Prompt: "You are locked in a cellar."
+
+2. Why Strip Away Sensory Details?
+
+By removing VAKOG elements from the base text, you achieve several training goals:
+
+Active Generation: The speaker cannot simply "repeat" the description provided in the text.
+
+Creative Ownership: The speaker decides if the cellar is high-tech, medieval, or domestic.
+
+Sense of Discovery: The speaker "discovers" the smell or the temperature in real-time as they talk.
+
+3. How to Write a Good Skeleton Prompt
+
+A. Define the Boundary
+
+Tell the user exactly where they are limited to.
+
+Example: "You are inside a stranded submarine."
+
+B. Use a Static Starting Point
+
+Ensure there is no immediate action happening. The prompt should feel like a "Start" button, not a "Fast Forward" button.
+
+Example: "You are sitting at the head of a long, empty banquet table."
+
+C. Include a "Mystery Variable"
+
+Provide one object or circumstance that requires explanation, but don't explain it.
+
+Example: "You are in an elevator that has stopped between floors, and there is a gift-wrapped box on the floor." (The box is the variable; how it looks or smells is up to the speaker).
+
+4. Examples of High-Quality Skeleton Prompts
+
+"You are standing on a stage behind a heavy velvet curtain."
+
+"You are in the driver's seat of a car parked on an empty bridge."
+
+"You wake up in a hospital room with no windows."
+
+"You are at the top of a lighthouse during a calm night."
+
+"You are inside a high-security vault that just slammed shut."
+
+
 ## Criteria for Excellent Practice Texts
+
 A strong practice text in Story Pacer serves as a "spark." It should provide enough detail to create a mental image but remain vague enough for the storyteller to fill in the gaps.
 
 ### 1. Focus on Location and Atmosphere (Setting)
